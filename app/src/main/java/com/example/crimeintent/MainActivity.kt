@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragement_container)
 
         if(currentFragment == null){
-            val fragment = CrimeFragement()
+            val fragment = CrimeListFragment.newInstance()
             supportFragmentManager.beginTransaction().add(R.id.fragement_container, fragment).commit()
         }
     }
