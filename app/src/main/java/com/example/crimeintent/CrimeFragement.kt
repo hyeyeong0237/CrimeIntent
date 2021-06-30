@@ -48,6 +48,8 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
     private lateinit var suspectButton: Button
     private lateinit var photoButton: ImageButton
     private lateinit var photoView : ImageView
+    private lateinit var saveButton: Button
+
     private val crimeDetailViewModel :CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
     }
@@ -71,6 +73,7 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
         suspectButton = view.findViewById(R.id.crime_suspect) as Button
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView = view.findViewById(R.id.crime_photo) as ImageView
+        saveButton = view.findViewById(R.id.save_button) as Button
 
 
         return view
@@ -173,11 +176,25 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
             }
         }
 
+
+        saveButton.apply {
+
+            setOnClickListener {
+                crimeDetailViewModel.saveCrime(crime)
+                Toast.makeText(getContext(), "저장되었습니다", Toast.LENGTH_SHORT).show()
+
+            }
+
+        }
+
     }
 
     override fun onStop() {
         super.onStop()
-        crimeDetailViewModel.saveCrime(crime)
+        //crimeDetailViewModel.saveCrime(crime)
+        /**
+         * crimeDetailViewModel.deleteCrime(crime)
+         */
     }
 
     override fun onDetach() {
@@ -233,7 +250,7 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
                     it.moveToFirst()
                     val suspect = it.getString(0)
                     crime.suspect = suspect
-                    crimeDetailViewModel.saveCrime(crime)
+                    //crimeDetailViewModel.saveCrime(crime)
                     suspectButton.text = suspect
                 }
             }

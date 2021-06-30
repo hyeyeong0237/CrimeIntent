@@ -6,14 +6,14 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.crimeintent.CrimeListFragment.Companion.newInstance
 import java.util.*
+
 
 private const val TAG = "CrimeListFragment"
 
@@ -41,20 +41,43 @@ class CrimeListFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
 
-        crimeRecyclerView =
-            view.findViewById(R.id.crime_recycler_view) as RecyclerView
+        crimeRecyclerView = view.findViewById(R.id.crime_recycler_view) as RecyclerView
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
         crimeRecyclerView.adapter = adapter
 
+        val itemTouchHelperCallback = object :
+                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.adapterPosition
+                    if(direction == ItemTouchHelper.LEFT){
+                        adapter?.swipeToDelete(position)
+                        updateUI(adapter?.crimes!!)
+
+                    }
+                }
+
+            }
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(crimeRecyclerView)
+
+
+
+
         return view
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -92,6 +115,7 @@ class CrimeListFragment : Fragment() {
 
     private fun updateUI(crimes: List<Crime>) {
         adapter = CrimeAdapter(crimes)
+        adapter!!.notifyDataSetChanged()
         crimeRecyclerView.adapter = adapter
     }
 
@@ -139,8 +163,15 @@ class CrimeListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
             val crime = crimes[position]
-
             holder.bind(crime)
+        }
+        fun swipeToDelete(position: Int) {
+            val crime = crimes[position]
+            crimeListViewModel.deleteCrime(crime)
+            notifyItemRemoved(position)
+            val Newcrimes = crimeListViewModel.crimeListLiveData
+            notifyItemRangeChanged(position,crimes.size)
+
         }
     }
 
