@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 
@@ -125,10 +126,12 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
         }
 
         reportButton.setOnClickListener {
+
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, getCrimeReport())
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+                putExtra(Intent.EXTRA_STREAM, photoUri)
             }.also { intent ->
                 val chooserIntent = Intent.createChooser(intent, getString(R.string.send_report))
                 startActivity(chooserIntent)

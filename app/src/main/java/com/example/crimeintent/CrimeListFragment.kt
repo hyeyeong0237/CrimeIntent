@@ -25,7 +25,7 @@ class CrimeListFragment : Fragment() {
 
     private var callbacks : Callbacks? = null
     private lateinit var crimeRecyclerView: RecyclerView
-    private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
+    private var adapter: CrimeAdapter? = CrimeAdapter(arrayListOf())
 
     private val crimeListViewModel: CrimeListViewModel by lazy {
         ViewModelProvider(this).get(CrimeListViewModel::class.java)
@@ -48,30 +48,25 @@ class CrimeListFragment : Fragment() {
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
         crimeRecyclerView.adapter = adapter
 
+
         val itemTouchHelperCallback = object :
-                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
+            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
 
-                    return false
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val position = viewHolder.adapterPosition
-                    if(direction == ItemTouchHelper.LEFT){
-                        adapter?.swipeToDelete(position)
-                        updateUI(adapter?.crimes!!)
-
-                    }
-                }
-
+                return false
             }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                if(direction == ItemTouchHelper.LEFT){
+                    val position = viewHolder.adapterPosition
+                    adapter?.swipeToDelete(position)
+
+                }
+            }
+
+        }
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(crimeRecyclerView)
-
 
 
 
@@ -114,8 +109,8 @@ class CrimeListFragment : Fragment() {
     }
 
     private fun updateUI(crimes: List<Crime>) {
-        adapter = CrimeAdapter(crimes)
-        adapter!!.notifyDataSetChanged()
+        val newcrimes = crimes.toMutableList()
+        adapter = CrimeAdapter(newcrimes)
         crimeRecyclerView.adapter = adapter
     }
 
@@ -150,7 +145,7 @@ class CrimeListFragment : Fragment() {
         }
     }
 
-    private inner class CrimeAdapter(var crimes: List<Crime>)
+    private inner class CrimeAdapter(var crimes: MutableList<Crime>)
         : RecyclerView.Adapter<CrimeHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
@@ -168,9 +163,9 @@ class CrimeListFragment : Fragment() {
         fun swipeToDelete(position: Int) {
             val crime = crimes[position]
             crimeListViewModel.deleteCrime(crime)
+            crimes.removeAt(position)
             notifyItemRemoved(position)
-            val Newcrimes = crimeListViewModel.crimeListLiveData
-            notifyItemRangeChanged(position,crimes.size)
+
 
         }
     }
