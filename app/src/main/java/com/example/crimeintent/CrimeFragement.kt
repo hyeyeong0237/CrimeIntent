@@ -50,6 +50,7 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
     private lateinit var photoButton: ImageButton
     private lateinit var photoView : ImageView
     private lateinit var saveButton: Button
+    private lateinit var RadioGroup :RadioGroup
 
     private val crimeDetailViewModel :CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
@@ -75,6 +76,7 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
         photoButton = view.findViewById(R.id.crime_camera) as ImageButton
         photoView = view.findViewById(R.id.crime_photo) as ImageView
         saveButton = view.findViewById(R.id.save_button) as Button
+        RadioGroup = view.findViewById(R.id.radioGroup) as RadioGroup
 
 
         return view
@@ -188,6 +190,15 @@ class CrimeFragement : Fragment(), DatePickerFragment.Callbacks{
 
             }
 
+        }
+        
+        RadioGroup.apply{
+            setOnCheckedChangeListener { group, checkedId ->
+                if(checkedId == R.id.radioButton1 )
+                    Toast.makeText(getContext(), "Happy가 눌려졌습니다",Toast.LENGTH_SHORT).show()
+                if(checkedId == R.id.radioButton2)
+                    Toast.makeText(getContext(), "Sad가 눌려졌습니다",Toast.LENGTH_SHORT).show()
+            }
         }
 
     }
